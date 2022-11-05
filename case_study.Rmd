@@ -1,0 +1,398 @@
+---
+title: 'Case Study: Cyclistic'
+author: "Nikhil kumar"
+date: "2022-10-23"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+# Introduction
+This is my Capstone Case Study for the Google Data Analytics Professional Certificate. I'm using R programming language for the 6 phase of analysis process(Ask, Prepare, Process, Analyze, Share and Act)
+
+
+### Scenario
+You are a junior data analyst working in the marketing analyst team at Cyclistic, a bike-share company in Chicago. The director of marketing believes the company’s future success depends on maximizing the number of annual memberships. Therefore, your team wants to understand how casual riders and annual members use Cyclistic bikes differently. From these insights, your team will design a new marketing strategy to convert casual riders into annual members. But first, Cyclistic executives must approve your recommendations, so they must be backed up with compelling data insights and professional data visualizations.
+
+### Characters and Teams
+
+* Cyclistic: A bike-share program that features more than 5,800 bicycles and 600 docking stations. Cyclistic sets itself apart by also offering reclining bikes, hand tricycles, and cargo bikes, making bike-share more inclusive to people with disabilities and riders who can’t use a standard two-wheeled bike. The majority of riders opt for traditional bikes; about 8% of riders use the assistive options. Cyclistic users are more likely to ride for leisure, but about 30% use them to commute to work each day.
+
+* Lily Moreno: The director of marketing and your manager. Moreno is responsible for the development of campaigns and initiatives to promote the bike-share program. These may include email, social media, and other channels.
+
+* Cyclistic marketing analytics team: A team of data analysts who are responsible for collecting, analyzing, and reporting data that helps guide Cyclistic marketing strategy. You joined this team six months ago and have been busy learning about Cyclistic’s mission and business goals — as well as how you, as a junior data analyst, can help Cyclistic achieve them.
+
+* Cyclistic executive team: The notoriously detail-oriented executive team will decide whether to approve the recommended marketing program.
+
+### About the company
+
+In 2016, Cyclistic launched a successful bike-share offering. Since then, the program has grown to a fleet of 5,824 bicycles that are geotracked and locked into a network of 692 stations across Chicago. The bikes can be unlocked from one station and returned to any other station in the system anytime.
+
+Until now, Cyclistic’s marketing strategy relied on building general awareness and appealing to broad consumer segments. One approach that helped make these things possible was the flexibility of its pricing plans: single-ride passes, full-day passes, and annual memberships. Customers who purchase single-ride or full-day passes are referred to as casual riders. Customers who purchase annual memberships are Cyclistic members.
+
+Cyclistic’s finance analysts have concluded that annual members are much more profitable than casual riders. Although the pricing flexibility helps Cyclistic attract more customers, Moreno believes that maximizing the number of annual members will be key to future growth. Rather than creating a marketing campaign that targets all-new customers, Moreno believes there is a
+very good chance to convert casual riders into members. She notes that casual riders are already aware of the Cyclistic program and have chosen Cyclistic for their mobility needs.
+
+Moreno has set a clear goal: Design marketing strategies aimed at converting casual riders into annual members. In order to do that, however, the marketing analyst team needs to better understand how annual members and casual riders differ, why casual riders would buy a membership, and how digital media could affect their marketing tactics. Moreno and her team are
+interested in analyzing the Cyclistic historical bike trip data to identify trends.
+
+## Phase 1: Ask
+
+### 1. Identify the business task:
+
+#### Business quesiton
+
+How do annual members and casual riders use Cyclistic bikes differently?
+
+
+#### Business Task: 
+
+Analyze trip data of January 2021 to September 2022 and find the difference between casual riders and annual members. Design marketing strategies that can convert occasional cyclists into annual members.
+
+## Phase 2: Prepare
+
+The data used in this analysis is made available to the public and located [here](https://divvy-tripdata.s3.amazonaws.com/index.html) (Note: The datasets have a different name because Cyclistic is a fictional company. For the purposes of this case study,the datasets are appropriate and will enable you to answer the business questions. The data has been made available by Motivate International Inc. under this [license](https://ride.divvybikes.com/data-license-agreement).)These data were in “.csv” format divided by months. Based on the requirement of the project activity, I downloaded the data for the months from January 2021 to September 2022.
+
+
+## Phase 3: Process
+
+For the analysis, I will be using R studio Dekstop.
+
+I will start by installing and loading required R packages to do data cleaning,  manipulation and  vizualization for my analysis 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r Install and loading packages}
+install.packages("tidyverse", repos = "https://cloud.r-project.org/")
+install.packages("ggplot2", repos="https://cloud.r-project.org/")
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r Upload csv file}
+
+sep_21 <- read.csv("~/case study/202109-divvy-tripdata.csv")
+oct_21 <- read.csv("~/case study/202110-divvy-tripdata.csv")
+nov_21 <- read.csv("~/case study/202111-divvy-tripdata.csv")
+dec_21 <- read.csv("~/case study/202112-divvy-tripdata.csv")
+jan_22 <- read.csv("~/case study/202201-divvy-tripdata.csv")
+feb_22 <- read.csv("~/case study/202202-divvy-tripdata.csv")
+mar_22 <- read.csv("~/case study/202203-divvy-tripdata.csv")
+apr_22 <- read.csv("~/case study/202204-divvy-tripdata.csv")
+may_22 <- read.csv("~/case study/202205-divvy-tripdata.csv")
+jun_22 <- read.csv("~/case study/202206-divvy-tripdata.csv")
+jul_22 <- read.csv("~/case study/202207-divvy-tripdata.csv")
+aug_22 <- read.csv("~/case study/202208-divvy-tripdata.csv")
+
+```
+
+## Phase 4: Analyse
+
+```{r Coloumn names}
+colnames(sep_21)
+colnames(oct_21)
+colnames(nov_21)
+colnames(dec_21)
+colnames(jan_22)
+colnames(feb_22)
+colnames(mar_22)
+colnames(apr_22)
+colnames(may_22)
+colnames(jun_22)
+colnames(jul_22)
+colnames(aug_22)
+ 
+```
+
+
+```{r Combine data}
+ sep2021_to_aug2022<- rbind(sep_21,
+                            oct_21,
+                            nov_21,
+                            dec_21,
+                            jan_22,
+                            feb_22,
+                            mar_22,
+                            apr_22,
+                            may_22,
+                            jun_22,
+                            jul_22,
+                            aug_22)
+```
+
+```{r}
+head(sep2021_to_aug2022)
+View(sep2021_to_aug2022)
+```
+
+```{r Check the NA values}
+colSums(is.na(sep2021_to_aug2022))
+```
+
+```{r Drop the NA values}
+cyclistic_dropped_na <- drop_na(sep2021_to_aug2022)
+nrow(sep2021_to_aug2022) - nrow(cyclistic_dropped_na) #recheck NA Values dropped or not
+```
+
+```{r}
+cyclistic <- cyclistic_dropped_na
+```
+
+```{r}
+str(cyclistic)
+```
+```{r}
+cyclelistic_new <- cyclistic %>% 
+  mutate(started_at = ymd_hms(started_at), ended_at = ymd_hms(ended_at))
+```
+
+
+```{r}
+glimpse(cyclelistic_new)
+```
+
+
+Now we separate columns for the date, weekday, month, year and ride duration will useful for our analysis.
+
+```{r}
+cyclelistic_new$date <- as.Date(cyclelistic_new$started_at, "%Y/%m/%d")
+cyclelistic_new$year <- format(as.Date(cyclelistic_new$date),"%y")
+cyclelistic_new$month <- format(as.Date(cyclelistic_new$date), "%m")
+cyclelistic_new$day <- format(as.Date(cyclelistic_new$date), "%d")
+cyclelistic_new$day_of_week <- format(as.Date(cyclelistic_new$date), "%A")
+```
+
+```{r}
+glimpse(cyclelistic_new)
+```
+
+```{r}
+cyclistic_hour <- mutate(cyclelistic_new, start_hour = hour(started_at), end_hour=hour(ended_at))
+```
+
+```{r}
+head(cyclistic_hour)
+```
+
+```{r}
+colSums(is.na(cyclistic_hour))
+```
+Drop NA values
+```{r}
+data_cleaned <- drop_na(cyclistic_hour)
+nrow(cyclistic_hour) - nrow(data_cleaned) #Check NA value dropped or not
+```
+
+
+```{r}
+data_cleaned$duration_sec <- as.numeric(data_cleaned$ended_at - data_cleaned$started_at) #length of ride in sec
+
+data_cleaned$duration_min <- as.numeric(data_cleaned$duration_sec/60) # length of ride in min
+```
+
+```{r}
+head(data_cleaned)
+```
+
+
+```{r}
+colSums(is.na(data_cleaned))
+```
+
+
+```{r}
+print(unique(data_cleaned$duration_sec < 0))
+```
+I noticed that in our dataframe contains ride with negative duration. so we have to drop that row.
+```{r}
+print(paste('before removing negative durations, our dataframe had', nrow(data_cleaned), 'rows.'))
+
+data_cleaned <- data_cleaned[data_cleaned$duration_sec > 0,]
+print(paste('after removing negative durations, our dataframe had', nrow(data_cleaned), 'rows.'))
+
+
+```
+```{r}
+data_cleaned$ride_length <- difftime(data_cleaned$ended_at, data_cleaned$started_at)
+```
+
+```{r}
+glimpse(data_cleaned)
+View(data_cleaned)
+```
+
+```{r}
+data_cleaned$ride_length <- as.numeric(as.character(data_cleaned$ride_length))
+```
+
+```{r}
+glimpse(data_cleaned)
+```
+
+```{r eval=FALSE, include=FALSE}
+data_cleaned %>% 
+  write.csv("cyclistic_cleaned_data.csv") #save cleaned file
+```
+
+## Analyze
+Now we analyze and visualize our data
+
+```{r}
+summary(data_cleaned)
+```
+
+
+```{r}
+aggregate(data_cleaned$ride_length ~ data_cleaned$member_casual, FUN = mean)
+aggregate(data_cleaned$ride_length ~ data_cleaned$member_casual, FUN = median)
+aggregate(data_cleaned$ride_length ~ data_cleaned$member_casual, FUN = max)
+aggregate(data_cleaned$ride_length ~ data_cleaned$member_casual, FUN = min)
+```
+
+```{r}
+summary(data_cleaned$ride_length)
+```
+
+
+```{r}
+data_cleaned$day_of_week <- ordered(data_cleaned$day_of_week, level=c("Sunday", "Monday", "Tuesday", "Wednesday", "Thrusday", "Friday", "Saturday"))
+```
+
+```{r}
+colSums(is.na(data_cleaned))
+```
+```{r}
+data_cleaned <- drop_na(data_cleaned)
+```
+
+
+```{r}
+colSums(is.na(data_cleaned))
+```
+
+
+```{r}
+tibble(data_cleaned)
+```
+
+```{r}
+#we summarise total no. of rides by casual and member and their ride percentage
+viz_1 <- data_cleaned %>% 
+  group_by(member_casual) %>%
+  summarise(total_ride = length(ride_id), percent = round(length(ride_id)/nrow(data_cleaned)*100))
+
+```
+
+
+```{r}
+ggplot(data=viz_1, aes(x=" ", y=total_ride, fill = member_casual))+
+  geom_bar(stat="identity", width = 1, color="white")+
+  coord_polar("y", start = 0)+
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), axis.ticks = element_blank(), legend.title = element_blank())+
+  labs(title = "Total Ride percent: Member vs Casual",caption = "Data from: September 2021 to August 2022 ")+
+  geom_text(aes(y=total_ride, label=paste0(percent, "%")), color ='black', position=position_stack(vjust = 0.5))
+
+```
+
+```{r}
+ viz_2 <- data_cleaned %>%
+  group_by(member_casual, day_of_week) %>% 
+  summarise(number_of_ride = n())
+
+tibble(viz_2)
+  
+```
+
+```{r, fig.width=12, fig.height=8 }
+#Viz 2
+ggplot(viz_2, aes(x=day_of_week, y=number_of_ride, fill=day_of_week))+
+  geom_col(position = "dodge")+
+  labs(title = "Number of rides by day of week", subtitle = "Casual vs. Member",caption = "Data from: September 2021 to August 2022 ", x='Day of Week', y="Number of Rides")+
+  facet_wrap(~member_casual)+
+  scale_y_continuous(labels = scales::comma)
+
+```
+we analyzed that member had more rides in day of week as compare to casual.
+
+
+```{r}
+ggplot(data=data_cleaned)+
+  geom_histogram(mapping = aes(x=start_hour), color='white', binwidth = 1)+
+  facet_wrap(~member_casual)+
+  labs(title = 'Riding Time', subtitle = 'Casual member vs. Annual member', caption ="Data from: September 2021 to August 2022 ", x="Start Time", y="No. of Rides")
+```
+
+
+
+
+ 
+  
+
+After analysis i found that the annual member more likely to ride bike during 4pm to 6pm and casual member also likely to ride bike during 4pm to 6pm. so we know that the riding rush hour time is 4pm to 6 pm.
+
+```{r}
+viz_4 <- data_cleaned %>% 
+  group_by(member_casual, month, day_of_week) %>% 
+  summarise(number_of_rides = n())
+
+tibble(viz_4)
+```
+
+```{r, fig.width=14, fig.height=12}
+#Viz 4
+ggplot(viz_4, aes(x=day_of_week, y=number_of_rides, fill=member_casual))+
+  geom_col(position = "dodge")+
+  facet_wrap(~month)+
+  labs(title = "Number of Rides each month:", subtitle = "Casual vs. Member", caption = "Data from: September 2021 to August 2022 ", x="Day of week", y="Number of Rides")+
+theme(axis.text.x = element_text(angle=90))
+```
+
+```{r}
+Viz_5 <- data_cleaned %>% 
+  mutate('weekdays' = data_cleaned$day_of_week) %>% 
+  group_by(member_casual, weekdays) %>% 
+  summarise(num_of_ride = n(), average_duration_min = mean(ride_length/60)) %>% 
+  arrange(member_casual, weekdays)
+
+tibble(Viz_5)
+```
+
+```{r}
+ggplot(Viz_5, aes(x=weekdays, y=num_of_ride, fill=member_casual))+
+  geom_col(position = "dodge")+
+  scale_y_continuous(labels = scales::comma)+
+  labs(title = "Weekday rides", subtitle = 'Casual vs. Member', caption = "Data from: September 2021 to August 2022 ", x= 'Weekday', y='No. of Rides' )
+```
+```{r}
+ggplot(Viz_5, aes(x=weekdays, y= average_duration_min, fill= member_casual))+
+geom_col(position = "dodge")+
+labs(title = "Average Duration of Rides", subtitle = 'Casual vs. Member', caption = "Data from: September 2021 to August 2022 ", x= 'Weekday', y='Average Duration Minute ' )
+```
+
+
+
+I found that Average ride duration of the casual rider is more than annual members. 
+
+# Phase 6: Act
+## Key findings
+* The annual member ride is more than casual members.
+* The casual rider prefer to use bikes  more during the weekend(Saturday,Sunday), but the annual member prefer to use bikes more during the weekdays(Monday-Friday).
+* Both the casual and annual members rush hour time is 4pm to 6m. The average ride duration of the casual member is longer than annual member.
+* Both the casual and annual member is ride more between the month of may to October . In the month of November to April there is low rides according to May to October.
+
+## Recomdations
+* I recommend that releasing monthly or 6 month  memberships will be great for increasing casual member convert into annual member. This monthly or 6 month  membership will attract casual member during a peak month may to October.
+
+* I highly recommend that giving 5 to 10% off to casual member for monthly, 6 month or annual memberships will attract the casual member.
+
+* Give the offer to casual user, if they subscribe for 6 month or above membership they will get one month free after expired their membership.
+
+* The marketing strategy and the ads campaign should aim at casual users during the weekend.
+
+* The average ride duration of casual rider is longer than annual members. So we should give offer,  the more you ride the more you get discount on annual membership it will encourage the casual user to get attracted.
+
